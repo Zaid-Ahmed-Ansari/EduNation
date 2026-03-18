@@ -34,12 +34,11 @@ export const SearchOverlay = () => {
         className="flex items-center gap-3 cursor-pointer group"
         onClick={() => setMode('landing')}
       >
-        <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-dark via-brand to-brand-light flex items-center justify-center shadow-[0_0_20px_rgba(249,115,22,0.5)] group-hover:scale-105 transition-transform duration-300">
-          <span className="text-white font-black text-xl leading-none">E</span>
-        </div>
-        <span className="text-2xl font-black text-white tracking-tighter hidden sm:block font-heading">
-          Edu<span className="text-transparent bg-clip-text bg-gradient-to-r from-brand to-brand-light">Nation</span>
-        </span>
+        <img 
+          src="/logo.png" 
+          alt="EduNation" 
+          className="h-10 object-contain group-hover:scale-105 transition-transform duration-300" 
+        />
       </div>
 
       {/* Search Input Area */}
