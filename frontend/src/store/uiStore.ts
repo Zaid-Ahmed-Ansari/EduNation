@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type ViewState = 'landing' | 'simulation' | 'analytics' | 'reference';
+type ViewState = 'landing' | 'simulation' | 'analytics' | 'reference' | 'donate';
 
 interface UIState {
   currentView: ViewState;

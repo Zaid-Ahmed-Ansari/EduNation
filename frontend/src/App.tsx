@@ -4,7 +4,9 @@ import { LandingPage } from './pages/LandingPage';
 import { AnalyticsDashboard } from './pages/AnalyticsDashboard';
 import { SimulationDashboard } from './pages/SimulationDashboard';
 import { ReferencePage } from './pages/ReferencePage';
+import { DonatePage } from './pages/DonatePage';
 import { PolicyPanel } from './components/simulation/PolicyPanel';
+import { SupportModal } from './components/layout/SupportModal';
 import { useUIStore } from './store/uiStore';
 import gsap from 'gsap';
 
@@ -51,6 +53,16 @@ function App() {
           <ReferencePage />
         </div>
       )}
+
+      {/* ═══ Donate Page Layer (Full Screen overlay) ═══ */}
+      {currentView === 'donate' && (
+        <div className="absolute inset-0 z-[150] bg-[#08090C]">
+          <DonatePage />
+        </div>
+      )}
+
+      {/* ═══ One-time Support Modal ═══ */}
+      <SupportModal />
 
     </div>
   );

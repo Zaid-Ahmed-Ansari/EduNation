@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Loader2, BookOpen } from 'lucide-react';
+import { Search, Loader2, BookOpen, Heart } from 'lucide-react';
 import { getCountries } from '../../api';
 import { useUIStore } from '../../store/uiStore';
 
@@ -78,8 +78,8 @@ export const SearchOverlay = () => {
         )}
       </div>
 
-      {/* Reference Link */}
-      <div className="hidden sm:flex items-center ml-2 border-l border-white/10 pl-6">
+      {/* Reference & Support Links */}
+      <div className="hidden sm:flex items-center ml-2 border-l border-white/10 pl-6 gap-4">
         <button 
           onClick={() => setMode('reference')}
           className="flex flex-col items-center justify-center text-white/40 hover:text-white transition-colors group relative"
@@ -87,6 +87,14 @@ export const SearchOverlay = () => {
         >
           <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform mb-1" />
           <span className="text-[9px] uppercase tracking-widest font-mono">Reference</span>
+        </button>
+        <button 
+          onClick={() => setMode('donate')}
+          className="flex flex-col items-center justify-center text-white/40 hover:text-orange-400 transition-colors group relative"
+          title="Support EduNation"
+        >
+          <Heart className="w-5 h-5 group-hover:scale-110 transition-transform mb-1" />
+          <span className="text-[9px] uppercase tracking-widest font-mono">Support</span>
         </button>
       </div>
 

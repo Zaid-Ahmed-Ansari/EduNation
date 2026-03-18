@@ -27,12 +27,16 @@
 - [⚡ Quick Start](#-quick-start)
 - [🟢 Good First Issues](#-good-first-issues)
 - [🤝 Contributing](#-contributing)
+- [❤️ Support EduNation](#️-support-edunation)
 
 ---
 
 ## 🔗 Check it Live
 
-**Coming Soon!** We will soon add a live domain URL where you can explore the fully interactive 3D globe and simulate policy impacts directly from your browser. Stay tuned!
+**[🌐 Launch EduNation →](https://edu-nation-j4o5.vercel.app/)**
+
+Explore the fully interactive 3D globe and simulate policy impacts directly from your browser.
+*(Note: Initial load may be slow as we are currently using free-tier hosting for the API.)*
 
 ---
 
@@ -334,3 +338,18 @@ Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for details.
 <p align="center">
   Built with ❤️ by <a href="https://github.com/zaid-ahmed-ansari">Zaid Ahmed Ansari</a>
 </p>
+## ❤️ Support EduNation
+
+If you find this project useful, you can support its development:
+
+### 🇮🇳 UPI Support
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/zaid-ahmed-ansari/EduNation/main/frontend/public/donate.jpeg" width="200" />
+</p>
+
+<p align="center">
+  UPI ID: <strong>zaid@upi</strong>
+</p>
+
+*Your support helps cover API & server costs and keeps EduNation free for everyone.*

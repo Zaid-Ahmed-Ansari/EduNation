@@ -29,13 +29,15 @@ app.use(rateLimit({
   message: { error: 'Too many requests, please try again later.' }
 }));
 
-// CORS - as per user request, we are SKIPping the strict CORS for now
-app.use(cors(
-  {
-    origin: 'https://edu-nation-j4o5.vercel.app',
-    credentials: true
-  }
-));
+// CORS — allow production frontend + localhost for development
+app.use(cors({
+  origin: [
+    'https://edu-nation-j4o5.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:5174',
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // Health Check
