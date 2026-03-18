@@ -20,17 +20,21 @@
 
 ## ✨ Feature Preview
 
+### 3D Interactive Globe
+![Globe](frontend/src/assets/globe.png)
+*Click any country to explore*
 
+### Analytics Dashboard
+![Analytics](frontend/src/assets/analytics.png)
+*25+ real-time indicators*
 
-| 3D Interactive Globe | Analytics Dashboard | Policy Simulation |
-|:---:|:---:|:---:|
-| ![Globe](frontend/src/assets/globe.png) | ![Analytics](frontend/src/assets/analytics.png) | ![Simulation](frontend/src/assets/simulation.png) |
-| Click any country to explore | 25+ real-time indicators | Adjust 25 policy sliders |
+### Policy Simulation
+![Simulation](frontend/src/assets/simulation.png)
+*Adjust 25 policy sliders*
 
-| Cross-Country Comparison | Data Year Selector | Progressive Loading |
-|:---:|:---:|:---:|
-| ![Compare](frontend/src/assets/compare.png) | *No image available* | *No image available* |
-| Side-by-side nation analysis | Historical year selection (2000–2024) | Per-metric skeleton loaders |
+### Cross-Country Comparison
+![Compare](frontend/src/assets/compare.png)
+*Side-by-side nation analysis*
 
 ---
 
