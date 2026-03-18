@@ -350,9 +350,7 @@ Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for details.
   <img src="https://raw.githubusercontent.com/zaid-ahmed-ansari/EduNation/main/frontend/public/donate.jpeg" width="200" />
 </p>
 
-<p align="center">
-  UPI ID: <strong>zaid@upi</strong>
-</p>
+
 
 <p align="center">
   <em>Your support helps cover API & server costs and keeps EduNation free for everyone.</em>
