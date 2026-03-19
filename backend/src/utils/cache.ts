@@ -1,15 +1,28 @@
 import { supabase } from '../config/supabase.js';
 import { redisClient, isRedisReady } from '../config/redis.js';
+import NodeCache from 'node-cache';
+
+// L1 Memory Cache: 5 minutes TTL (short lived to prevent memory bloat, but long enough to absorb traffic spikes from same country load)
+const memCache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 
 /**
- * Multi-tier cache: Upstash Redis (fast) → Supabase api_cache table (persistent) → null (miss)
+ * Multi-tier cache: 
+ * L1: NodeCache in-memory (5 min) → fast, zero network
+ * L2: Upstash Redis (fast) → prevents DB hits across server restarts
+ * L3: Supabase api_cache table (persistent) → null (miss)
  */
 export const getCache = async (endpoint: string): Promise<any | null> => {
-  // Tier 1: Try Upstash Redis
+  // Tier 1: In-Memory NodeCache
+  const l1Data = memCache.get(`nh:${endpoint}`);
+  if (l1Data) return l1Data;
+
+  // Tier 2: Try Upstash Redis
   if (isRedisReady() && redisClient) {
     try {
       const redisData = await redisClient.get<any>(`nh:${endpoint}`);
       if (redisData) {
+        // Backfill L1 Memory Cache
+        memCache.set(`nh:${endpoint}`, redisData);
         return redisData; // Upstash auto-deserializes JSON
       }
     } catch (err) {
@@ -17,7 +30,7 @@ export const getCache = async (endpoint: string): Promise<any | null> => {
     }
   }
 
-  // Tier 2: Try Supabase api_cache
+  // Tier 3: Try Supabase api_cache
   try {
     const { data, error } = await supabase
       .from('api_cache')
@@ -39,6 +52,9 @@ export const getCache = async (endpoint: string): Promise<any | null> => {
       const ttlSeconds = Math.max(1, Math.floor((expiresAt.getTime() - now.getTime()) / 1000));
       redisClient.set(`nh:${endpoint}`, data.response, { ex: ttlSeconds }).catch(() => {});
     }
+    
+    // Backfill L1 Memory Cache
+    memCache.set(`nh:${endpoint}`, data.response);
 
     return data.response;
   } catch (err) {
@@ -68,6 +84,9 @@ export const setCache = async (
       console.warn('Redis SET failed:', err);
     }
   }
+  
+  // Write to L1 Cache
+  memCache.set(`nh:${endpoint}`, response);
 
   // Write to Supabase (persistent backup)
   try {

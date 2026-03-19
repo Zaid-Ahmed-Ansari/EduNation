@@ -56,13 +56,20 @@ app.listen(port, () => {
   
   // Cache Warming
   setTimeout(() => {
-    console.log('🔥 Initiating cache warming for top 5 countries (USA, IND, CHN, GBR, DEU)...');
+    console.log('🔥 Initiating staggered cache warming for top 5 countries (USA, IND, CHN, GBR, DEU)...');
     try {
       import('./controllers/countryController.js').then(({ getCountryIndicators }) => {
-        ['USA', 'IND', 'CHN', 'GBR', 'DEU'].forEach(code => {
-          // Fire-and-forget dummy requests
-          getCountryIndicators({ params: { code } } as any, { json: () => {} } as any).catch(() => {});
-        });
+        const countries = ['USA', 'IND', 'CHN', 'GBR', 'DEU'];
+        countries.reduce((promiseChain, code, index) => {
+          return promiseChain.then(() => new Promise((resolve) => {
+            setTimeout(() => {
+              console.log(`[Cache Warm] Loading ${code}...`);
+              getCountryIndicators({ params: { code } } as any, { json: () => {} } as any)
+                .catch(() => {})
+                .finally(() => resolve(undefined));
+            }, index === 0 ? 0 : 5000); // 5 sec break between countries to prevent CPU spike
+          }));
+        }, Promise.resolve(undefined));
       });
     } catch (e) {
       console.error('Failed to warm cache:', e);

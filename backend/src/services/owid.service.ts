@@ -19,7 +19,7 @@ const loadOwidCo2 = () => {
 export const fetchOwidData = async (type: 'co2' | 'energy', iso3: string) => {
   if (type === 'co2') {
     const data = loadOwidCo2();
-    return data[iso3] || [];
+    return data?.[iso3] || [];
   }
   
   // Note: energy data is not currently used by the frontend.
