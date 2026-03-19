@@ -3,6 +3,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useUIStore } from '../store/uiStore';
 import { SearchOverlay } from '../components/layout/SearchOverlay';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { MobileLandingPage } from './mobile/MobileLandingPage';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,7 +13,11 @@ const InteractiveGlobe = React.lazy(() =>
 );
 
 export const LandingPage = () => {
+  const isMobile = useIsMobile();
   const { currentView } = useUIStore();
+
+  // On mobile, render the simplified landing page
+  if (isMobile) return <MobileLandingPage />;
   
   // Master container for pinning
   const containerRef = useRef<HTMLDivElement>(null);
@@ -89,7 +95,7 @@ export const LandingPage = () => {
         className="absolute inset-0 z-[10] flex items-center justify-center pointer-events-none"
       >
         <Suspense fallback={
-          <div className="text-white/30 animate-pulse font-mono tracking-widest text-sm">
+          <div className="text-white/30 animate-pulse font-mono tracking-widest text-xs sm:text-sm">
             IGNITING RENDER ENGINE...
           </div>
         }>
@@ -101,14 +107,14 @@ export const LandingPage = () => {
       <div className="absolute inset-0 z-[20] pointer-events-none flex items-center justify-center">
         
         {/* HERO TITLE */}
-        <div ref={heroTextRef} className="flex flex-col items-center justify-center w-full">
+        <div ref={heroTextRef} className="flex flex-col items-center justify-center w-full px-4">
           <h1 
-            className="text-[15vw] font-black tracking-tighter leading-none select-none text-transparent mix-blend-overlay"
+            className="text-[11vw] sm:text-[13vw] md:text-[15vw] font-black tracking-tighter leading-none select-none text-transparent mix-blend-overlay"
             style={{ WebkitTextStroke: '1px rgba(255,255,255,0.4)' }}
           >
             EDUNATION
           </h1>
-          <p className="mt-4 text-lg md:text-xl font-light tracking-[0.3em] uppercase text-white/50">
+          <p className="mt-2 sm:mt-4 text-sm sm:text-lg md:text-xl font-light tracking-[0.2em] sm:tracking-[0.3em] uppercase text-white/50">
             Scroll to explore
           </p>
         </div>
@@ -116,17 +122,17 @@ export const LandingPage = () => {
         {/* SCENE 1 TEXT (LEFT) */}
         <div 
           ref={feature1Ref} 
-          className="absolute left-[8%] md:left-[12%] w-full max-w-md text-left"
+          className="absolute left-[5%] sm:left-[8%] md:left-[12%] w-[90%] sm:w-full max-w-sm sm:max-w-md text-left"
         >
-          <div className="overflow-hidden mb-4">
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-white leading-[1.1]">
+          <div className="overflow-hidden mb-2 sm:mb-4">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight text-white leading-[1.1]">
               Analyze <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-300">
                 Everything.
               </span>
             </h2>
           </div>
-          <p className="text-lg md:text-xl text-white/60 font-light leading-relaxed">
+          <p className="text-sm sm:text-lg md:text-xl text-white/60 font-light leading-relaxed">
             Real-time macroeconomic intelligence seamlessly mapped to a high-fidelity 3D interface.
           </p>
         </div>
@@ -134,17 +140,17 @@ export const LandingPage = () => {
         {/* SCENE 2 TEXT (RIGHT) */}
         <div 
           ref={feature2Ref} 
-          className="absolute right-[8%] md:right-[12%] w-full max-w-md text-right flex flex-col items-end"
+          className="absolute right-[5%] sm:right-[8%] md:right-[12%] w-[90%] sm:w-full max-w-sm sm:max-w-md text-right flex flex-col items-end"
         >
-          <div className="overflow-hidden mb-4">
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-white leading-[1.1]">
+          <div className="overflow-hidden mb-2 sm:mb-4">
+            <h2 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight text-white leading-[1.1]">
               Simulate <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-l from-orange-500 to-amber-300">
                 Tomorrow.
               </span>
             </h2>
           </div>
-          <p className="text-lg md:text-xl text-white/60 font-light leading-relaxed text-right">
+          <p className="text-sm sm:text-lg md:text-xl text-white/60 font-light leading-relaxed text-right">
             Adjust global policies and instantly visualize the ripple effects across 30+ comprehensive data points.
           </p>
         </div>
@@ -152,11 +158,11 @@ export const LandingPage = () => {
         {/* CTA (CENTER BOTTOM) */}
         <div 
           ref={ctaRef} 
-          className="absolute bottom-[15%] flex flex-col items-center justify-center w-full"
+          className="absolute bottom-[12%] sm:bottom-[15%] flex flex-col items-center justify-center w-full px-4"
         >
-          <button className="group relative pointer-events-auto px-10 py-5 bg-transparent overflow-hidden rounded-full border border-white/20 transition-all duration-700 hover:border-orange-500/50 hover:shadow-[0_0_40px_rgba(249,115,22,0.2)]">
+          <button className="group relative pointer-events-auto px-6 py-3 sm:px-10 sm:py-5 bg-transparent overflow-hidden rounded-full border border-white/20 transition-all duration-700 hover:border-orange-500/50 hover:shadow-[0_0_40px_rgba(249,115,22,0.2)]">
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-            <span className="relative text-sm md:text-base font-medium tracking-[0.2em] uppercase text-white group-hover:text-orange-300 transition-colors duration-300">
+            <span className="relative text-xs sm:text-sm md:text-base font-medium tracking-[0.15em] sm:tracking-[0.2em] uppercase text-white group-hover:text-orange-300 transition-colors duration-300">
               Initialize Environment
             </span>
           </button>

@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export const SimulationDashboard = () => {
-  const { selectedCountry, setMode } = useUIStore();
+  const { selectedCountry, setMode, isSidebarOpen, toggleSidebar, isPolicyPanelOpen, togglePolicyPanel } = useUIStore();
   const { policies } = useSimulationStore();
   
   // Navigation State
@@ -93,10 +93,28 @@ export const SimulationDashboard = () => {
   ];
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#08090C] font-sans text-white">
+    <div className="flex h-screen w-full overflow-hidden bg-[#08090C] font-sans text-white relative">
+
+      {/* ═══ MOBILE SIDEBAR TOGGLE (floating) ═══ */}
+      {!isSidebarOpen && (
+        <button
+          onClick={toggleSidebar}
+          className="fixed top-16 left-3 z-[130] lg:hidden flex items-center justify-center w-10 h-10 rounded-full bg-[#0E1017] border border-white/10 text-white/60 shadow-lg hover:text-white transition-colors"
+        >
+          ☰
+        </button>
+      )}
       
+      {/* ═══ MOBILE SIDEBAR BACKDROP ═══ */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm lg:hidden animate-[fadeIn_0.3s_ease]"
+          onClick={toggleSidebar}
+        />
+      )}
+
       {/* ═══ SIDEBAR ═══ */}
-      <aside className="relative z-10 flex h-full w-[256px] flex-shrink-0 flex-col overflow-y-auto border-r border-white/[0.06] bg-[#0E1017]">
+      <aside className={`fixed inset-y-0 left-0 z-[120] flex h-full w-[280px] flex-shrink-0 flex-col overflow-y-auto border-r border-white/[0.06] bg-[#0E1017] transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Country header */}
         <div className="border-b border-white/[0.06] p-5 pb-4">
           <div className="mb-4 flex items-center gap-3">
@@ -190,7 +208,7 @@ export const SimulationDashboard = () => {
         Note: The PolicyPanel floats on the right and is 400px wide. 
         We use pr-[424px] to ensure the main content doesn't get obscured. 
       */}
-      <main className="flex flex-1 flex-col gap-5 overflow-y-auto px-6 py-5 pr-[424px]">
+      <main className="flex flex-1 flex-col gap-3 sm:gap-5 overflow-y-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-5 pr-0 xl:pr-[424px] pt-16 sm:pt-20 lg:pt-5 scroll-smooth">
         {/* Warning Banner */}
         <div className="dash-reveal rounded-lg bg-[rgba(224,123,53,0.1)] border border-[rgba(224,123,53,0.2)] p-3 text-[11px] text-[#E07B35] flex items-start gap-2">
           <span className="text-[13px] leading-none">⚠️</span>
@@ -201,26 +219,37 @@ export const SimulationDashboard = () => {
         </div>
 
         {/* Top bar */}
-        <div className="dash-reveal flex items-center justify-between">
+        <div className="dash-reveal flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-0">
           <div>
-            <h1 className="font-serif text-[1.6rem] leading-none tracking-tight">
+            <h1 className="font-serif text-[1.4rem] lg:text-[1.6rem] leading-none tracking-tight">
               Simulation <em className="italic text-[#E07B35]">Results</em>
             </h1>
-            <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-white/30">
+            <p className="mt-1 font-mono text-[9px] lg:text-[10px] uppercase tracking-[0.08em] text-white/30">
               10-Year Horizon ({baseline.year || 2022} - {(baseline.year || 2022) + 10})
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#141720] p-1">
-            {(['Dashboard', 'Raw Projections'] as const).map((t) => (
-              <button
-                key={t}
-                className={`rounded-full px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.05em] transition-all
-                  ${activeTopTab === t ? 'bg-[#0E1017] text-white shadow-sm' : 'text-white/35 hover:text-white'}`}
-                onClick={() => setActiveTopTab(t)}
-              >
-                {t}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#141720] p-1">
+              {(['Dashboard', 'Raw Projections'] as const).map((t) => (
+                <button
+                  key={t}
+                  className={`rounded-full px-3 lg:px-3.5 py-1 lg:py-1.5 font-mono text-[9px] lg:text-[10px] uppercase tracking-[0.05em] transition-all
+                    ${activeTopTab === t ? 'bg-[#0E1017] text-white shadow-sm' : 'text-white/35 hover:text-white'}`}
+                  onClick={() => setActiveTopTab(t)}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            {/* Policy Toggle for Mobile */}
+            <button 
+              onClick={togglePolicyPanel}
+              className={`xl:hidden flex items-center gap-2 px-4 py-2 rounded-full border border-orange-500/20 text-orange-400 font-mono text-[9px] uppercase tracking-wider transition-all
+                ${isPolicyPanelOpen ? 'bg-orange-500/20' : 'bg-transparent'}`}
+            >
+              <TrendingUp size={14} />
+              {isPolicyPanelOpen ? 'Close Engine' : 'Tune Policies'}
+            </button>
           </div>
         </div>
 
@@ -228,7 +257,7 @@ export const SimulationDashboard = () => {
           <>
             {/* 10-Year Projected Deltas row */}
             {activeNav === 'Overview' && (
-              <div className="dash-reveal grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="dash-reveal grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
                   {
                     label: 'GDP Growth',
@@ -368,8 +397,8 @@ export const SimulationDashboard = () => {
                 <p className="mt-0.5 text-[11px] text-white/35">Raw generated values based on cumulative policy engine multipliers.</p>
               </div>
               
-              <div className="flex-1 overflow-auto rounded-xl border border-white/[0.04] bg-[#0a0c10]">
-                <table className="w-full text-left font-mono text-xs">
+              <div className="flex-1 overflow-x-auto overflow-y-auto rounded-xl border border-white/[0.04] bg-[#0a0c10] scrollbar-thin scrollbar-thumb-white/10">
+                <table className="w-full min-w-[600px] text-left font-mono text-xs">
                   <thead className="sticky top-0 bg-[#0E1017] border-b border-white/[0.06] z-10 text-white/40 uppercase tracking-widest text-[10px]">
                     <tr>
                       <th className="px-5 py-3 font-medium">Year</th>

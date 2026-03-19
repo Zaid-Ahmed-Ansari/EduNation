@@ -7,18 +7,18 @@ export const ReferencePage = () => {
   return (
     <div className="min-h-screen bg-[#08090C] text-white overflow-y-auto">
       {/* ═══ Header ═══ */}
-      <div className="sticky top-0 z-10 bg-[#0E1017]/80 backdrop-blur-xl border-b border-white/[0.06] p-6 lg:px-12 flex items-center justify-between">
+      <div className="sticky top-0 z-50 bg-[#0E1017]/80 backdrop-blur-xl border-b border-white/[0.06] p-4 lg:p-6 lg:px-12 flex flex-col sm:flex-row sm:items-center justify-between gap-4 lg:gap-0">
         <div>
-          <h1 className="font-serif text-[1.8rem] leading-none tracking-tight">
+          <h1 className="font-serif text-[1.5rem] lg:text-[1.8rem] leading-none tracking-tight">
             Legal & <em className="italic text-[#E07B35]">Reference</em>
           </h1>
-          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-white/40">
+          <p className="mt-1 font-mono text-[9px] lg:text-[10px] uppercase tracking-[0.08em] text-white/40">
             Transparency • Data Sources • Formulas
           </p>
         </div>
         <button
           onClick={() => setMode('landing')}
-          className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.02] px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-white/60 transition-all hover:border-white/20 hover:text-white"
+          className="flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.02] px-4 py-2 text-[11px] lg:text-[12px] font-semibold uppercase tracking-[0.05em] text-white/60 transition-all hover:border-white/20 hover:text-white w-fit"
         >
           <ArrowLeft size={14} />
           Back to Globe
@@ -128,12 +128,12 @@ const SourceCard = ({ name, description, endpoint }: { name: string, description
 const ApiRoute = ({ route, desc }: { route: string, desc: string }) => {
   const [method, path] = route.split(' ');
   return (
-    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 rounded-lg border border-white/[0.04] bg-[#0E1017] p-3 text-sm">
-      <div className="flex items-center gap-2 min-w-[300px]">
-        <span className="font-mono text-[10px] bg-[#27B08A]/10 text-[#27B08A] px-2 py-1 rounded font-bold">{method}</span>
-        <span className="font-mono text-[#E07B35] text-[12px]">{path}</span>
+    <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4 rounded-lg border border-white/[0.04] bg-[#0E1017] p-3 text-sm">
+      <div className="flex items-center gap-2 min-w-0 lg:min-w-[300px]">
+        <span className="font-mono text-[9px] lg:text-[10px] bg-[#27B08A]/10 text-[#27B08A] px-2 py-1 rounded font-bold">{method}</span>
+        <span className="font-mono text-[#E07B35] text-[11px] lg:text-[12px] truncate">{path}</span>
       </div>
-      <span className="text-white/50">{desc}</span>
+      <span className="text-white/50 text-xs lg:text-sm">{desc}</span>
     </div>
   );
 };

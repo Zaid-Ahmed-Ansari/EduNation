@@ -13,22 +13,23 @@ export const DonatePage = () => {
       {/* Back button */}
       <button
         onClick={() => setMode('landing')}
-        className="absolute top-8 left-8 flex items-center gap-2 text-white/40 hover:text-white transition-colors text-sm font-mono tracking-wider"
+        className="absolute top-6 left-6 lg:top-8 lg:left-8 flex items-center gap-2 text-white/40 hover:text-white transition-colors text-xs lg:text-sm font-mono tracking-wider z-50"
       >
         <ArrowLeft size={16} />
-        Back to Globe
+        <span className="hidden xs:inline">Back to Globe</span>
+        <span className="xs:hidden">Back</span>
       </button>
 
       {/* Main card */}
-      <div className="relative max-w-md w-full">
-        <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] rounded-3xl p-10 text-center shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
+      <div className="relative max-w-md w-full px-4 sm:px-0 animate-[upIn_0.6s_ease-out]">
+        <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] rounded-3xl p-6 sm:p-10 text-center shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
           
           {/* Heart icon */}
           <div className="mx-auto mb-6 w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500/20 to-rose-500/20 flex items-center justify-center border border-orange-500/20">
             <Heart className="w-8 h-8 text-orange-400" fill="rgba(251,146,60,0.3)" />
           </div>
 
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-2">
             Support EduNation
           </h1>
           <p className="text-white/50 text-sm leading-relaxed mb-8">
@@ -40,7 +41,7 @@ export const DonatePage = () => {
             <img
               src="/donate.jpeg"
               alt="UPI QR Code"
-              className="w-52 h-52 object-contain"
+              className="w-40 h-40 sm:w-52 sm:h-52 object-contain"
             />
           </div>
 

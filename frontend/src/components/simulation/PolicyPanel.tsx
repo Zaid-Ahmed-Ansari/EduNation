@@ -78,7 +78,7 @@ export const PolicyPanel = () => {
   };
 
   return (
-    <div className="flex h-full w-[400px] flex-col bg-[#0E1017] text-white overflow-hidden">
+    <div className="flex h-full w-full flex-col bg-[#0E1017] text-white overflow-hidden">
       {/* ── Header ── */}
       <div className="flex-shrink-0 border-b border-white/[0.06] p-6 shadow-sm">
         <div className="flex items-start justify-between">

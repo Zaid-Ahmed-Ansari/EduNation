@@ -163,7 +163,7 @@ const axisStyle = {
 
 // ─── Main Component ───────────────────────────────────────────────────────
 export const AnalyticsDashboard = () => {
-  const { selectedCountry, setMode } = useUIStore();
+  const { selectedCountry, setMode, isSidebarOpen, toggleSidebar } = useUIStore();
   const [activeCat, setActiveCat] = useState('all');
   const [activeNav, setActiveNav] = useState('Overview');
   const [activeTopTab, setActiveTopTab] = useState<'Overview' | 'Trends' | 'Raw Data' | 'Compare'>('Overview');
@@ -310,10 +310,28 @@ export const AnalyticsDashboard = () => {
   const latestLifeExp = latestValues['lifeExp'];
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#08090C] font-sans text-white">
+    <div className="flex h-screen w-full overflow-hidden bg-[#08090C] font-sans text-white relative">
+
+      {/* ═══ MOBILE SIDEBAR TOGGLE (floating) ═══ */}
+      {!isSidebarOpen && (
+        <button
+          onClick={toggleSidebar}
+          className="fixed top-16 left-3 z-[130] lg:hidden flex items-center justify-center w-10 h-10 rounded-full bg-[#0E1017] border border-white/10 text-white/60 shadow-lg hover:text-white transition-colors"
+        >
+          ☰
+        </button>
+      )}
+
+      {/* ═══ MOBILE SIDEBAR BACKDROP ═══ */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm lg:hidden animate-[fadeIn_0.3s_ease]"
+          onClick={toggleSidebar}
+        />
+      )}
 
       {/* ═══ SIDEBAR ═══ */}
-      <aside className="relative z-10 flex h-full w-[256px] flex-shrink-0 flex-col overflow-y-auto border-r border-white/[0.06] bg-[#0E1017]">
+      <aside className={`fixed inset-y-0 left-0 z-[120] flex h-full w-[280px] flex-shrink-0 flex-col overflow-y-auto border-r border-white/[0.06] bg-[#0E1017] transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
 
         {/* Country header */}
         <div className="border-b border-white/[0.06] p-5 pb-4">
@@ -408,23 +426,23 @@ export const AnalyticsDashboard = () => {
       </aside>
 
       {/* ═══ MAIN ═══ */}
-      <main className="flex flex-1 flex-col gap-5 overflow-y-auto px-6 py-5">
+      <main className="flex flex-1 flex-col gap-3 sm:gap-5 overflow-y-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-5 pt-16 sm:pt-20 lg:pt-5 scroll-smooth">
 
         {/* Top bar */}
-        <div className="dash-reveal flex items-center justify-between">
+        <div className="dash-reveal flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
           <div>
-            <h1 className="font-serif text-[1.6rem] leading-none tracking-tight">
+            <h1 className="font-serif text-[1.2rem] sm:text-[1.4rem] lg:text-[1.6rem] leading-none tracking-tight">
               Analytics <em className="italic text-[#E07B35]">Dashboard</em>
             </h1>
-            <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em] text-white/30">
-              Strictly filtered to {dataYear} · {ALL_INDICATORS.length} indicators loaded
+            <p className="mt-1 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.08em] text-white/30">
+              Filtered to {dataYear} · {ALL_INDICATORS.length} indicators
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-[#141720] p-1">
+          <div className="flex items-center gap-1 sm:gap-2 rounded-full border border-white/[0.08] bg-[#141720] p-1 overflow-x-auto flex-nowrap">
             {(['Overview', 'Trends', 'Raw Data', 'Compare'] as const).map((t) => (
               <button
                 key={t}
-                className={`rounded-full px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.05em] transition-all
+                className={`rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.05em] transition-all whitespace-nowrap
                   ${activeTopTab === t ? 'bg-[#0E1017] text-white shadow-sm' : 'text-white/35 hover:text-white'}`}
                 onClick={() => {
                    setActiveTopTab(t);
@@ -444,7 +462,7 @@ export const AnalyticsDashboard = () => {
           <>
             {/* Primary 4 metrics (Only on 'all' category or 'Overview' top tab for context) */}
             {activeCat === 'all' && (
-              <div className="dash-reveal grid grid-cols-2 gap-3 lg:grid-cols-4">
+              <div className="dash-reveal grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
                 <PrimaryCard
                   label="Gross Domestic Product" icon={DollarSign}
                   value={latestGdp ? formatCurrency(latestGdp) : 'N/A'}
@@ -474,7 +492,7 @@ export const AnalyticsDashboard = () => {
 
             {/* Insights row */}
             {activeCat === 'all' && (
-              <div className="dash-reveal grid grid-cols-3 gap-3">
+              <div className="dash-reveal grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                 <InsightCard
                   label="GDP per Capita" icon={TrendingUp}
                   value={latestValues['gdp'] && latestValues['pop'] ? `$${Math.round(latestValues['gdp'] / latestValues['pop']).toLocaleString()}` : 'N/A'}
@@ -509,12 +527,12 @@ export const AnalyticsDashboard = () => {
               </div>
 
               {/* Category chips */}
-              <div className="mb-3 flex flex-wrap gap-1.5">
+              <div className="mb-3 flex gap-1.5 overflow-x-auto pb-1 scrollbar-none flex-nowrap sm:flex-wrap">
                 {CATEGORIES.map(({ key, label, icon: Icon }) => (
                   <button
                     key={key}
                     onClick={() => setActiveCat(key)}
-                    className={`flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.06em] transition-all
+                    className={`flex items-center gap-1.5 rounded-full border px-2.5 sm:px-3 py-1 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.06em] transition-all whitespace-nowrap flex-shrink-0
                       ${activeCat === key
                         ? 'border-[rgba(224,123,53,0.25)] bg-[rgba(224,123,53,0.1)] text-[#E07B35]'
                         : 'border-white/[0.07] text-white/35 hover:border-white/15 hover:text-white'
@@ -529,8 +547,7 @@ export const AnalyticsDashboard = () => {
               {/* Indicator cards grid */}
               <div
                 ref={indGridRef}
-                className="grid gap-2"
-                style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(148px, 1fr))' }}
+                className="grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
               >
                 {filteredIndicators.map((ind) => {
                   const val = latestValues[ind.key];
@@ -567,7 +584,7 @@ export const AnalyticsDashboard = () => {
             
             {/* Charts preview for Overview layout */}
             {activeCat === 'all' && (
-              <div className="dash-reveal grid grid-cols-2 gap-3 pb-6">
+              <div className="dash-reveal grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 pb-6">
                  <div className="rounded-2xl border border-white/[0.06] bg-[#0E1017] p-5 cursor-pointer hover:border-white/10 transition-colors" onClick={() => setActiveTopTab('Trends')}>
                   <div className="flex items-start justify-between">
                     <div>
@@ -596,7 +613,7 @@ export const AnalyticsDashboard = () => {
         {/* ======================================== */}
         {activeTopTab === 'Trends' && (
           <div className="flex flex-col gap-4">
-            <div className="dash-reveal grid grid-cols-2 gap-3">
+            <div className="dash-reveal grid grid-cols-1 lg:grid-cols-2 gap-3">
               <div className="rounded-2xl border border-white/[0.06] bg-[#0E1017] p-5">
                 <div className="flex items-start justify-between">
                   <div>
@@ -656,7 +673,7 @@ export const AnalyticsDashboard = () => {
               </div>
             </div>
 
-            <div className="dash-reveal grid grid-cols-2 gap-3 pb-6">
+            <div className="dash-reveal grid grid-cols-1 lg:grid-cols-2 gap-3 pb-6">
               <div className="rounded-2xl border border-white/[0.06] bg-[#0E1017] p-5">
                 <p className="text-[13px] font-semibold tracking-tight">Population Growth</p>
                 <p className="mt-0.5 text-[11px] text-white/35">Annual % change 1990 – 2023</p>
@@ -757,7 +774,7 @@ export const AnalyticsDashboard = () => {
         {activeTopTab === 'Compare' && (
           <div className="dash-reveal pb-6">
             <div className="rounded-2xl border border-white/[0.06] bg-[#0E1017] p-5 overflow-hidden flex flex-col h-[calc(100vh-140px)]">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div>
                   <p className="text-[13px] font-semibold tracking-tight">Cross-Country Comparison</p>
                   <p className="mt-0.5 text-[11px] text-white/35">Compare {countryData?.name?.common} against any other nation for the year {dataYear}.</p>
@@ -767,7 +784,7 @@ export const AnalyticsDashboard = () => {
                   <select 
                     value={compareCode}
                     onChange={(e) => setCompareCode(e.target.value)}
-                    className="bg-black border border-white/10 text-white rounded-md px-3 py-1.5 text-xs outline-none min-w-[180px]"
+                    className="bg-black border border-white/10 text-white rounded-md px-3 py-1.5 text-xs outline-none min-w-[140px] lg:min-w-[180px]"
                   >
                     <option value="" disabled>Select Country</option>
                     {globalCountries?.filter((c: any) => c.cca3 !== selectedCountry).sort((a: any,b: any) => a.name.localeCompare(b.name)).map((c: any) => (
