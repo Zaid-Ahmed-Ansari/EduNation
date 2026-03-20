@@ -25,6 +25,7 @@
 - [🧠 Architecture Overview](#-architecture-overview)
 - [🛠️ Tech Stack](#️-tech-stack)
 - [⚡ Quick Start](#-quick-start)
+- [🐳 Docker Services](#-docker-services)
 - [🟢 Good First Issues](#-good-first-issues)
 - [🤝 Contributing](#-contributing)
 - [❤️ Support EduNation](#️-support-edunation)
@@ -231,10 +232,7 @@ edunation/
 
 ### Prerequisites
 
-- **Node.js** ≥ 18
-- **npm** ≥ 9
-- A free [Supabase](https://supabase.com) project
-- *(Optional)* A free [Upstash Redis](https://upstash.com) database
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) with Docker Compose
 
 ### 1. Clone the Repository
 
@@ -243,57 +241,55 @@ git clone https://github.com/zaid-ahmed-ansari/EduNation.git
 cd EduNation
 ```
 
-### 2. Set Up the Database
-
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to the **SQL Editor** and run the contents of [`schema.sql`](./schema.sql)
-3. Copy your project **URL** and **anon key** from Settings → API
-
-### 3. Configure Backend
+### 2. Start the Full Stack (Docker)
 
 ```bash
-cd backend
-cp .env.example .env
+docker compose up -d --build
 ```
 
-Edit `.env` with your real credentials:
+This starts all required containers (frontend, backend, postgres, redis) and runs schema initialization automatically before the backend starts.
 
-```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your_anon_key_here
+### 3. (Optional) Seed Data
 
-# Optional: Upstash Redis for caching
-REDIS_URL=https://your-redis.upstash.io
-REDIS_TOKEN=your_token_here
-```
-
-Install dependencies and start:
+If you want local Postgres to contain preloaded indicator data:
 
 ```bash
-npm install
-npm run dev        # Starts on http://localhost:5000
+docker compose exec backend npx tsx src/scripts/ingest.ts
 ```
 
-### 4. Populate the Database
-
-```bash
-npx tsx src/scripts/ingest.ts
-```
-
-This ingests regions, countries, 25 indicators (for 30 countries), and simulation baselines from the World Bank & REST Countries APIs. Takes ~5 minutes.
-
-### 5. Configure Frontend
-
-```bash
-cd ../frontend
-cp .env.example .env    # Default values usually work
-npm install
-npm run dev             # Starts on http://localhost:5173
-```
-
-### 6. Open in Browser
+### 4. Open in Browser
 
 Navigate to **http://localhost:5173** and explore the globe! 🌍
+
+### 5. Useful Docker Commands
+
+```bash
+# View running services
+docker compose ps
+
+# View backend logs
+docker compose logs -f backend
+
+# Stop everything
+docker compose down
+
+# Stop and remove volumes (fresh DB/Redis)
+docker compose down -v
+```
+
+---
+
+## 🐳 Docker Services
+
+EduNation runs with these services in [docker-compose.yml](./docker-compose.yml):
+
+- `frontend` (`edunation-frontend`): Vite React app on `http://localhost:5173`
+- `backend` (`edunation-backend`): Express API on `http://localhost:5000`
+- `postgres` (`edunation-postgres`): PostgreSQL 16 on `localhost:5432`
+- `redis` (`edunation-redis`): Redis 7 on `localhost:6379`
+- `db-init` (`edunation-db-init`): one-time schema bootstrap job that applies [SCHEMA.SQL](./SCHEMA.SQL) if tables are missing
+
+Schema bootstrap logic lives in [scripts/init-db.sh](./scripts/init-db.sh).
 
 ---
 

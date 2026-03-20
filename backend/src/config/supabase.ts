@@ -19,6 +19,4 @@ if (!hasValidSupabaseConfig) {
 
 export const isSupabaseEnabled = hasValidSupabaseConfig;
 
-export const supabase = hasValidSupabaseConfig
-  ? createClient(supabaseUrl, supabaseKey)
-  : (null as any);
+export const supabase = hasValidSupabaseConfig ? createClient(supabaseUrl, supabaseKey): (null as any);
