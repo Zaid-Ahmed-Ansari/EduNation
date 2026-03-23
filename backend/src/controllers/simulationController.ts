@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { pgPool, isPostgresReady } from '../config/postgres.js';
+import { getPgPool, isPostgresReady } from '../config/postgres.js';
 import { supabase, isSupabaseEnabled } from '../config/supabase.js';
 import { getCache, setCache } from '../utils/cache.js';
 import fs from 'fs';
@@ -43,7 +43,7 @@ export const getSimulationBaseline = async (req: Request, res: Response) => {
     let result: any;
 
     if (devEnvironment()) {
-      const baselineQuery = await pgPool!.query(
+      const baselineQuery = await getPgPool().query(
         `SELECT c.name, c.iso3, c.population, sb.gdp, sb.gdp_growth, sb.life_expectancy,
                 sb.co2_emissions, sb.unemployment, sb.hdi, sb.innovation_index, sb.year
          FROM countries c
@@ -166,7 +166,7 @@ export const getGlobalRankings = async (req: Request, res: Response) => {
     let rankings: any[] = [];
 
     if (devEnvironment()) {
-      const rankingsQuery = await pgPool!.query(
+      const rankingsQuery = await getPgPool().query(
         `SELECT c.name, c.iso3, sb.gdp, sb.life_expectancy, sb.co2_emissions, sb.unemployment
          FROM simulation_baselines sb
          JOIN countries c ON c.id = sb.country_id
@@ -240,11 +240,11 @@ export const getIndicatorHistory = async (req: Request, res: Response) => {
     let result: any;
 
     if (devEnvironment()) {
-      const countryRes = await pgPool!.query(
+      const countryRes = await getPgPool().query(
         'SELECT id FROM countries WHERE iso3 = $1 LIMIT 1',
         [code.toUpperCase()]
       );
-      const indicatorRes = await pgPool!.query(
+      const indicatorRes = await getPgPool()  .query(
         'SELECT id, name, unit FROM indicators WHERE code = $1 LIMIT 1',
         [indicator]
       );
@@ -256,7 +256,7 @@ export const getIndicatorHistory = async (req: Request, res: Response) => {
         return res.status(404).json({ error: 'Country or indicator not found' });
       }
 
-      const valuesRes = await pgPool!.query(
+      const valuesRes = await getPgPool().query(
         `SELECT year, value
          FROM indicator_values
          WHERE country_id = $1 AND indicator_id = $2

@@ -1,17 +1,19 @@
 import { Redis } from "ioredis";
 
-export const localRedisInit = () => {
-  let localRedisClient: Redis | null = null;
+let redisClient: Redis | null = null;
 
+export const localRedisInit = () => {
   if (process.env.NODE_ENV === "development") {
-    localRedisClient = new Redis({
+    redisClient = new Redis({
       host: "redis",
       port: 6379,
     });
-    localRedisClient.on("connect", () => {
+
+    redisClient.on("connect", () => {
       console.log("✅ Local Redis client connected");
     });
-    localRedisClient.on("error", (err: unknown) => {
+
+    redisClient.on("error", (err: unknown) => {
       console.error("Local Redis connection error:", err);
     });
   } else {
@@ -20,3 +22,12 @@ export const localRedisInit = () => {
     );
   }
 };
+
+export const getRedisClient = () => {
+  if (!redisClient) {
+    throw new Error("Redis not initialized");
+  }
+  return redisClient;
+};
+
+export const isRedisReady = () => redisClient !== null;

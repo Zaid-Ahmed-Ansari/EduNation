@@ -16,6 +16,7 @@ if (UPSTASH_URL && UPSTASH_TOKEN) {
   console.log('✅ Upstash Redis client initialized');
 } 
 if (!UPSTASH_URL || !UPSTASH_TOKEN) {
+  // If Upstash is not configured, attempt to initialize local Redis client ( dev environment )
   localRedisInit();
 }
 else{

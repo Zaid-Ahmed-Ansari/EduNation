@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getCache, setCache } from '../utils/cache.js';
-import { pgPool, isPostgresReady } from '../config/postgres.js';
+import { getPgPool, isPostgresReady } from '../config/postgres.js';
 
 const BASE_URL = 'https://api.worldbank.org/v2';
 
@@ -16,9 +16,9 @@ export const fetchIndicator = async (countryCode: string, indicatorCode: string)
   if (cached) return cached;
 
   // 2. Relational DB check (indicator_values)
-  if (isPostgresReady() && pgPool) {
+  if (isPostgresReady() && getPgPool()) {
     try {
-      const dbRes = await pgPool.query(
+      const dbRes = await getPgPool().query(
         `SELECT iv.year, iv.value
          FROM indicator_values iv
          JOIN countries c ON c.id = iv.country_id
