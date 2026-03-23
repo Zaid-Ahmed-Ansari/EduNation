@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase.js';
+import { supabase, isSupabaseEnabled } from '../config/supabase.js';
 import { redisClient, isRedisReady } from '../config/redis.js';
 import NodeCache from 'node-cache';
 
@@ -30,7 +30,9 @@ export const getCache = async (endpoint: string): Promise<any | null> => {
     }
   }
 
-  // Tier 3: Try Supabase api_cache
+  // Tier 3: Try Supabase api_cache (only when enabled)
+  if (!isSupabaseEnabled) return null;
+
   try {
     const { data, error } = await supabase
       .from('api_cache')
@@ -88,7 +90,9 @@ export const setCache = async (
   // Write to L1 Cache
   memCache.set(`nh:${endpoint}`, response);
 
-  // Write to Supabase (persistent backup)
+  // Write to Supabase (persistent backup) when enabled
+  if (!isSupabaseEnabled) return;
+
   try {
     await supabase.from('api_cache').delete().eq('endpoint', endpoint);
     const { error } = await supabase.from('api_cache').insert({

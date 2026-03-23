@@ -20,9 +20,9 @@ First off, thank you for considering contributing to EduNation! 🌍
 ### 🔧 Pull Requests
 
 1. **Fork** the repo and create your branch from `main`
-2. **Install** dependencies: `npm install` in both `frontend/` and `backend/`
+2. **Start local stack with Docker**: `docker compose up -d --build`
 3. **Code** your changes following the existing patterns
-4. **Test** your changes locally (`npm run dev` in both directories)
+4. **Test** your changes locally (frontend at `http://localhost:5173`, backend at `http://localhost:5000`)
 5. **Commit** with clear, descriptive messages (e.g., `feat: add CO2 trend chart`)
 6. **Push** to your fork and open a Pull Request
 
@@ -50,7 +50,34 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## Development Setup
 
-See the [README](./README.md) for full setup instructions.
+EduNation is Docker-first for local development.
+
+### Start
+
+```bash
+docker compose up -d --build
+```
+
+Note: For local Docker development, do not add or edit backend .env.
+The required development variables are already defined in docker-compose.yml (including NODE_ENV=development).
+
+### Services/Containers
+
+- `frontend` (`edunation-frontend`)
+- `backend` (`edunation-backend`)
+- `postgres` (`edunation-postgres`)
+- `redis` (`edunation-redis`)
+- `db-init` (`edunation-db-init`, one-time schema init)
+
+### Helpful commands
+
+```bash
+docker compose ps
+docker compose logs -f backend
+docker compose down
+```
+
+See the [README](./README.md) for full setup details.
 
 ## Questions?
 
