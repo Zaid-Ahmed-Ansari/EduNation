@@ -1,4 +1,6 @@
 import { Redis } from '@upstash/redis';
+import { localRedisInit } from './localRedisInit.js';
+
 
 // Support both naming conventions for Upstash env vars
 const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_URL || '';
@@ -12,10 +14,14 @@ if (UPSTASH_URL && UPSTASH_TOKEN) {
     token: UPSTASH_TOKEN,
   });
   console.log('✅ Upstash Redis client initialized');
-} else {
-  console.warn('⚠️  Upstash Redis credentials not set — Redis caching disabled');
+} 
+if (!UPSTASH_URL || !UPSTASH_TOKEN) {
+  // If Upstash is not configured, attempt to initialize local Redis client ( dev environment )
+  localRedisInit();
 }
-
+else{
+  console.warn('⚠️ Upstash and Local Redis not initlialized. Redis-backed features are disabled.');
+}
 export { redisClient };
 
 /**

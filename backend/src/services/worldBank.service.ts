@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { getCache, setCache } from '../utils/cache.js';
+import { getPgPool, isPostgresReady } from '../config/postgres.js';
 
 const BASE_URL = 'https://api.worldbank.org/v2';
-
-import { supabase } from '../config/supabase.js';
 
 /**
  * Fetch raw indicator data from World Bank API 
@@ -17,25 +16,29 @@ export const fetchIndicator = async (countryCode: string, indicatorCode: string)
   if (cached) return cached;
 
   // 2. Relational DB check (indicator_values)
-  try {
-    const { data: dbData, error } = await supabase
-      .from('indicator_values')
-      .select('year, value, country:country_id!inner(iso3), indicator:indicator_id!inner(code)')
-      .eq('country.iso3', countryCode.toUpperCase())
-      .eq('indicator.code', indicatorCode)
-      .order('year', { ascending: false });
+  if (isPostgresReady() && getPgPool()) {
+    try {
+      const dbRes = await getPgPool().query(
+        `SELECT iv.year, iv.value
+         FROM indicator_values iv
+         JOIN countries c ON c.id = iv.country_id
+         JOIN indicators i ON i.id = iv.indicator_id
+         WHERE c.iso3 = $1 AND i.code = $2
+         ORDER BY iv.year DESC`,
+        [countryCode.toUpperCase(), indicatorCode]
+      );
 
-    // Ensure we actually got rows (inner joins correctly filter)
-    if (!error && dbData && dbData.length > 0) {
-      const formatted = [
-        { page: 1, pages: 1, per_page: dbData.length, total: dbData.length },
-        dbData.map((row: any) => ({ date: String(row.year), value: Number(row.value) }))
-      ];
-      await setCache('World_Bank', endpoint, formatted, 24);
-      return formatted;
+      if (dbRes.rows.length > 0) {
+        const formatted = [
+          { page: 1, pages: 1, per_page: dbRes.rows.length, total: dbRes.rows.length },
+          dbRes.rows.map((row: any) => ({ date: String(row.year), value: Number(row.value) }))
+        ];
+        await setCache('World_Bank', endpoint, formatted, 24);
+        return formatted;
+      }
+    } catch (e) {
+      console.error('DB fetch failed, falling back to API:', e);
     }
-  } catch (e) {
-    console.error('DB fetch failed, falling back to API:', e);
   }
 
   // 3. API Fallback

@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 ---
 
-## -- REGIONS
+-- REGIONS
 
 CREATE TABLE regions (
 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -12,7 +12,7 @@ name TEXT UNIQUE NOT NULL
 
 ---
 
-## -- COUNTRIES
+-- COUNTRIES
 
 CREATE TABLE countries (
 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -36,7 +36,7 @@ CREATE INDEX idx_country_region ON countries(region_id);
 
 ---
 
-## -- INDICATORS
+-- INDICATORS
 
 CREATE TABLE indicators (
 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -49,7 +49,7 @@ source TEXT
 
 ---
 
-## -- INDICATOR VALUES (TIME SERIES DATA)
+-- INDICATOR VALUES (TIME SERIES DATA)
 
 CREATE TABLE indicator_values (
 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -68,7 +68,7 @@ ON indicator_values(indicator_id, year);
 
 ---
 
-## -- GLOBAL INDICATOR VALUES
+-- GLOBAL INDICATOR VALUES
 
 CREATE TABLE global_indicator_values (
 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -80,7 +80,7 @@ value NUMERIC
 
 ---
 
-## -- SIMULATION BASELINES
+-- SIMULATION BASELINES
 
 CREATE TABLE simulation_baselines (
 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -97,7 +97,7 @@ year INTEGER
 
 ---
 
-## -- POLICY VARIABLES
+-- POLICY VARIABLES
 
 CREATE TABLE policy_variables (
 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -110,7 +110,7 @@ default_value NUMERIC DEFAULT 50
 
 ---
 
-## -- API CACHE
+-- API CACHE
 
 CREATE TABLE api_cache (
 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -125,7 +125,7 @@ CREATE INDEX idx_api_cache_endpoint ON api_cache(endpoint);
 
 ---
 
-## -- DATA SOURCES
+-- DATA SOURCES
 
 CREATE TABLE data_sources (
 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

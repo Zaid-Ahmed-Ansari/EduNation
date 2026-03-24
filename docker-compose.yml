@@ -1,0 +1,107 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: edunation-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - edunation-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: edunation-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=edunation
+      - POSTGRES_PASSWORD=edunation_dev_password
+      - POSTGRES_DB=edunation_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./SCHEMA.SQL:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - edunation-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edunation -d edunation_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db-init:
+    image: postgres:16-alpine
+    container_name: edunation-db-init
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - PGPASSWORD=edunation_dev_password
+      - POSTGRES_USER=edunation
+      - POSTGRES_DB=edunation_db
+    volumes:
+      - ./SCHEMA.SQL:/schema/SCHEMA.SQL:ro
+      - ./scripts/init-db.sh:/scripts/init-db.sh:ro
+    command: ["sh", "/scripts/init-db.sh"]
+    networks:
+      - edunation-network
+    restart: "no"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: edunation-backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/tsconfig.json:/app/tsconfig.json
+    environment:
+      - NODE_ENV=development
+      - DISABLE_SUPABASE=true
+      - PORT=5000
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://edunation:edunation_dev_password@postgres:5432/edunation_db
+    networks:
+      - edunation-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: edunation-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+    networks:
+      - edunation-network
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+  postgres-data:
+
+networks:
+  edunation-network:
+    driver: bridge
