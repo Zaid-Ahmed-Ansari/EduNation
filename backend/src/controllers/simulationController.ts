@@ -24,7 +24,7 @@ const getHappinessData = () => {
 // NOTE -> don't add NODE_ENV in the main .env file as it will break the local Redis connection in development mode
 
 const devEnvironment = (): boolean => {
-  return process.env.NODE_ENV === 'development' && isPostgresReady() && pgPool !== null;
+  return process.env.NODE_ENV === 'development' && isPostgresReady();
 };
 
 /**
@@ -240,14 +240,16 @@ export const getIndicatorHistory = async (req: Request, res: Response) => {
     let result: any;
 
     if (devEnvironment()) {
-      const countryRes = await getPgPool().query(
-        'SELECT id FROM countries WHERE iso3 = $1 LIMIT 1',
-        [code.toUpperCase()]
-      );
-      const indicatorRes = await getPgPool()  .query(
-        'SELECT id, name, unit FROM indicators WHERE code = $1 LIMIT 1',
-        [indicator]
-      );
+      const [countryRes, indicatorRes] = await Promise.all([
+        getPgPool().query(
+          'SELECT id FROM countries WHERE iso3 = $1 LIMIT 1',
+          [code.toUpperCase()]
+        ),
+        getPgPool().query(
+          'SELECT id, name, unit FROM indicators WHERE code = $1 LIMIT 1',
+          [indicator]
+        )
+      ]);
 
       const country = countryRes.rows[0];
       const ind = indicatorRes.rows[0];
@@ -278,16 +280,18 @@ export const getIndicatorHistory = async (req: Request, res: Response) => {
         return res.status(503).json({ error: 'Supabase is not configured' });
       }
 
-      const { data: country } = await supabase
-        .from('countries')
-        .select('id')
-        .eq('iso3', code.toUpperCase())
-        .single();
-      const { data: ind } = await supabase
-        .from('indicators')
-        .select('id, name, unit')
-        .eq('code', indicator)
-        .single();
+      const [{ data: country }, { data: ind }] = await Promise.all([
+        supabase
+          .from('countries')
+          .select('id')
+          .eq('iso3', code.toUpperCase())
+          .single(),
+        supabase
+          .from('indicators')
+          .select('id, name, unit')
+          .eq('code', indicator)
+          .single()
+      ]);
 
       if (!country || !ind) {
         return res.status(404).json({ error: 'Country or indicator not found' });

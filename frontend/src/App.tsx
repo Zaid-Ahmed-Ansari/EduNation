@@ -1,13 +1,13 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, Suspense, lazy } from 'react';
 import { LandingPage } from './pages/LandingPage';
-import { AnalyticsDashboard } from './pages/AnalyticsDashboard';
-import { SimulationDashboard } from './pages/SimulationDashboard';
-import { MobileAnalyticsDashboard } from './pages/mobile/MobileAnalyticsDashboard';
-import { MobileSimulationDashboard } from './pages/mobile/MobileSimulationDashboard';
-import { ReferencePage } from './pages/ReferencePage';
-import { DonatePage } from './pages/DonatePage';
-import { PolicyPanel } from './components/simulation/PolicyPanel';
+const AnalyticsDashboard = lazy(() => import('./pages/AnalyticsDashboard').then(m => ({ default: m.AnalyticsDashboard })));
+const SimulationDashboard = lazy(() => import('./pages/SimulationDashboard').then(m => ({ default: m.SimulationDashboard })));
+const MobileAnalyticsDashboard = lazy(() => import('./pages/mobile/MobileAnalyticsDashboard').then(m => ({ default: m.MobileAnalyticsDashboard })));
+const MobileSimulationDashboard = lazy(() => import('./pages/mobile/MobileSimulationDashboard').then(m => ({ default: m.MobileSimulationDashboard })));
+const ReferencePage = lazy(() => import('./pages/ReferencePage').then(m => ({ default: m.ReferencePage })));
+const DonatePage = lazy(() => import('./pages/DonatePage').then(m => ({ default: m.DonatePage })));
+const PolicyPanel = lazy(() => import('./components/simulation/PolicyPanel').then(m => ({ default: m.PolicyPanel })));
 import { SupportModal } from './components/layout/SupportModal';
 import { useUIStore } from './store/uiStore';
 import { useIsMobile } from './hooks/useIsMobile';
@@ -36,7 +36,7 @@ function App() {
 
       {/* ═══ MOBILE DASHBOARD LAYERS ═══ */}
       {isMobile && (
-        <>
+        <Suspense fallback={null}>
           {currentView === 'analytics' && (
             <div className="fixed inset-0 z-[40] bg-[#08090C]">
               <MobileAnalyticsDashboard />
@@ -47,7 +47,7 @@ function App() {
               <MobileSimulationDashboard />
             </div>
           )}
-        </>
+        </Suspense>
       )}
 
       {/* ═══ DESKTOP Dashboard UI Layer (fixed full screen, Appears on Country Select) ═══ */}
@@ -56,39 +56,45 @@ function App() {
           ref={uiContainerRef}
           className="fixed inset-0 z-[40] opacity-0 pointer-events-none"
         >
-          {currentView === 'analytics' && <AnalyticsDashboard />}
-          {currentView === 'simulation' && (
-            <div className="relative h-full w-full">
-              <SimulationDashboard />
-              
-              {/* Policy Panel Backdrop (tablet) */}
-              {isPolicyPanelOpen && (
-                <div 
-                  className="fixed inset-0 z-[45] bg-black/60 backdrop-blur-sm xl:hidden animate-[fadeIn_0.3s_ease]"
-                  onClick={togglePolicyPanel}
-                />
-              )}
+          <Suspense fallback={null}>
+            {currentView === 'analytics' && <AnalyticsDashboard />}
+            {currentView === 'simulation' && (
+              <div className="relative h-full w-full">
+                <SimulationDashboard />
+                
+                {/* Policy Panel Backdrop (tablet) */}
+                {isPolicyPanelOpen && (
+                  <div 
+                    className="fixed inset-0 z-[45] bg-black/60 backdrop-blur-sm xl:hidden animate-[fadeIn_0.3s_ease]"
+                    onClick={togglePolicyPanel}
+                  />
+                )}
 
-              {/* Policy Panel */}
-              <div className={`fixed xl:absolute right-0 top-0 z-[50] h-full w-full sm:w-[400px] border-l border-white/[0.06] bg-[#0E1017] shadow-2xl transition-transform duration-300 ease-in-out ${isPolicyPanelOpen ? 'translate-x-0' : 'translate-x-full xl:translate-x-0'}`}>
-                <PolicyPanel />
+                {/* Policy Panel */}
+                <div className={`fixed xl:absolute right-0 top-0 z-[50] h-full w-full sm:w-[400px] border-l border-white/[0.06] bg-[#0E1017] shadow-2xl transition-transform duration-300 ease-in-out ${isPolicyPanelOpen ? 'translate-x-0' : 'translate-x-full xl:translate-x-0'}`}>
+                  <PolicyPanel />
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </Suspense>
         </div>
       )}
 
       {/* ═══ Reference Page Layer (Full Screen overlay) ═══ */}
       {currentView === 'reference' && (
         <div className="fixed inset-0 z-[150] bg-[#08090C]">
-          <ReferencePage />
+          <Suspense fallback={null}>
+            <ReferencePage />
+          </Suspense>
         </div>
       )}
 
       {/* ═══ Donate Page Layer (Full Screen overlay) ═══ */}
       {currentView === 'donate' && (
         <div className="fixed inset-0 z-[150] bg-[#08090C]">
-          <DonatePage />
+          <Suspense fallback={null}>
+            <DonatePage />
+          </Suspense>
         </div>
       )}
 

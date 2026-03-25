@@ -109,8 +109,8 @@ export const getCountryIndicators = async (req: Request, res: Response) => {
       { key: 'tourism', id: 'ST.INT.ARVL' }
     ];
 
-    // Fire all fetches concurrently. The existing cache utility prevents DB hammering.
-    const results = await Promise.all(
+    // Fire all indicator fetches concurrently.
+    const indicatorPromise = Promise.all(
       indicatorsList.map(async (ind) => {
         try {
           const data = await fetchIndicator(code, ind.id);
@@ -120,13 +120,17 @@ export const getCountryIndicators = async (req: Request, res: Response) => {
         }
       })
     );
+    
+    // Concurrently fetch country details for happiness data mapping
+    const countryPromise = fetchCountryByCode(code).catch(() => null);
+
+    const [results, countryDetails] = await Promise.all([indicatorPromise, countryPromise]);
 
     // Merge array of objects into a single payload object
     const payload = Object.assign({}, ...results);
     
     // Attach Happiness Data
     try {
-      const countryDetails = await fetchCountryByCode(code);
       const countryName = countryDetails[0]?.name?.common || countryDetails?.name?.common;
       if (countryName) {
         const hapData = getHappinessData();
